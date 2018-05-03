@@ -2,16 +2,19 @@ import os
 
 
 description = "A bot that retrieves prices of Yu-Gi-Oh! cards from YugiohPrices.com"
-prefix = "%%"
+prefix = "$"
 
 here_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(here_path, "data")
-token_path = os.path.join(here_path, "token.txt")
+token_path = os.path.join(data_path, "token.txt")
 sets_path = os.path.join(data_path, "set_names.json")
 cards_path = os.path.join(data_path, "card_names.json")
 
 with open(token_path, 'r') as f:
     token = f.read()
+
+max_results = 3
+trunc_len = 20
 
 icons = {
     "dark": "http://i.imgur.com/slNEyVk.png",
@@ -41,3 +44,41 @@ colors = {
     "spell": "0x1D9E74",
     "trap": "0xBC5A84"
 }
+
+rarity_subs = [
+    (" Rare", ""),
+    ("Duel Terminal", "DT"),
+    ("DT Normal Parallel", "DT Normal"),
+    ("DT Super Parallel", "DT Super"),
+    ("DT Ultra Parallel", "DT Ultra"),
+    ("Unknown Rarity", "Unknown")
+]
+
+rarities = [
+    "Super Short Print",
+    "Short Print",
+    "Common",
+    "Rare",
+    "Super",
+    "Ultra",
+    "Secret",
+    "Ghost",
+    "Ultimate",
+    "Ghost/Gold",
+    "Gold",
+    "Gold Secret",
+    "Platinum",
+    "Platinum Secret",
+    "Prismatic Secret",
+    "Extra Secret",
+    "DT Normal",
+    "DT Super",
+    "DT Ultra",
+    "Normal Parallel",
+    "Super Parallel",
+    "Ultra Parallel",
+    "Shatterfoil",
+    "Starfoil",
+    "Mosaic",
+    "Unknown"
+]

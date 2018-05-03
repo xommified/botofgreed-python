@@ -26,7 +26,7 @@ async def pc(ctx, *, arg):
         rarity = "all"
 
     name = utils.closest_name(name)
-    rarity = cards.get_card_rarity(rarity)
+    rarity = utils.get_rarity(rarity)
 
     data = cards.get_card_prices(name, rarity)
 
@@ -52,9 +52,10 @@ async def ps(ctx, *, arg):
         await bot.add_reaction(ctx.message, "❓")
 
 
-@bot.command()
-async def kill():
-    await bot.logout()
+@bot.command(pass_context=True)
+async def kill(ctx):
+    if ctx.message.author.id == config.owner_id:
+        await bot.logout()
 
 
 def run():

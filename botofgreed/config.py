@@ -1,17 +1,19 @@
 import os
-
+import json
 
 description = "A bot that retrieves prices of Yu-Gi-Oh! cards from YugiohPrices.com"
 prefix = "$"
 
 here_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(here_path, "data")
-token_path = os.path.join(data_path, "token.txt")
+config_path = os.path.join(data_path, "config.json")
 sets_path = os.path.join(data_path, "set_names.json")
 cards_path = os.path.join(data_path, "card_names.json")
 
-with open(token_path, 'r') as f:
-    token = f.read()
+with open(config_path, 'r') as f:
+    j = json.load(f)
+    token = j["token"]
+    owner_id = j["owner_id"]
 
 max_results = 3
 trunc_len = 20

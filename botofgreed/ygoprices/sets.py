@@ -76,4 +76,3 @@ def build_set_message(set_name, resp):
                   icon_url="http://i.imgur.com/kLsxdAd.png")
     # em.set_thumbnail(url=image)
     return None, em
-

@@ -1,11 +1,15 @@
-import requests
 import difflib
 import json
+
+import requests
 
 from botofgreed import config
 
 
 def get_rarity(rarity):
+    if not rarity:
+        return None, False
+
     r = rarity
     for key, value in config.rarity_subs:
         r = r.replace(key, value)
@@ -13,9 +17,12 @@ def get_rarity(rarity):
     r = difflib.get_close_matches(r, config.rarities, n=1)
 
     if len(r) == 0:
-        return rarity
+        return None, True
     else:
-        return r[0]
+        if r[0].casefold() == rarity.casefold():
+            return r[0], False
+        else:
+            return r[0], True
 
 
 def closest_name(name, lookup="card"):
@@ -29,12 +36,15 @@ def closest_name(name, lookup="card"):
     with open(index_file, 'r') as f:
         index = json.load(f)
 
-    r = difflib.get_close_matches(name, index, n=1)
+    r = difflib.get_close_matches(name, index, n=1, cutoff=config.similarity)
 
     if len(r) == 0:
-        return name
+        return name, True
     else:
-        return r[0]
+        if r[0].casefold() == name.casefold():
+            return r[0], False
+        else:
+            return r[0], True
 
 
 def get_set_names():

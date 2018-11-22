@@ -1,7 +1,7 @@
-import difflib
 from urllib.parse import quote
-import requests
+
 import discord
+import requests
 from prettytable import PrettyTable
 
 from botofgreed import config
@@ -9,25 +9,37 @@ from botofgreed.ygoprices import utils
 
 
 def get_card_prices(name, rarity):
+    r = requests.get(config.card_price_endpoint.format(name))
+    if r.status_code not in (200, 404):
+        return r.status_code
 
-    r = requests.get("http://yugiohprices.com/api/get_card_prices/{}".format(name))
-    if r.status_code != 200:
-        return None, None
+    if r.status_code == 404:
+        return None
+
     j = r.json()
     if j["status"] == "success":
-        if rarity != "all":
-            j["data"] = [row for row in j["data"] if utils.get_rarity(row["rarity"]) == rarity]
+        if rarity:
+            j["data"] = [row for row in j["data"] if utils.get_rarity(row["rarity"])[0] == rarity]
         return j
     else:
         return None
 
 
-def build_card_message(name, resp, rarity):
-
+def build_card_message(name, resp, req_rarity, rarity_guess):
     post = ""
 
-    if resp is None:
-        return None, None
+    if isinstance(resp, int):
+        em = discord.Embed(type="rich",
+                           description="HTTP status code {} from YugiohPrices.".format(resp),
+                           color=int("0xFF0000", 0),
+                           title="View on YugiohPrices.com",
+                           url=config.card_price_url.format(quote(name)))
+        em.set_author(name="Error", icon_url=config.icons["Error"])
+        em.set_footer(text="Check if YugiohPrices.com is down. If not, contact xomm.",
+                      icon_url=config.icons["YGOP"])
+        return em, False
+    elif not resp:
+        return None, False
 
     pt = PrettyTable()
     pt.field_names = ["Set", "Rarity", "Low-Avg"]
@@ -39,7 +51,7 @@ def build_card_message(name, resp, rarity):
     for i, row in enumerate(resp["data"]):
 
         card_set = row["print_tag"]  # .split("-")[0]
-        rarity = utils.get_rarity(row["rarity"])
+        rarity = utils.get_rarity(row["rarity"])[0]
 
         if rarity not in seen:
             seen[rarity] = 0
@@ -59,31 +71,38 @@ def build_card_message(name, resp, rarity):
         pt.add_row([card_set, rarity, price])
 
     if len(resp["data"]) == 0:
-        pt = "No prints of '{}' found for rarity '{}'.".format(name, rarity)
+        pt = "No prints of '{}' found for rarity '{}'.".format(name, req_rarity)
+
+    if rarity_guess:
+        post += "Unknown rarity, best guess: `{}`. Valid rarities are: \n```{}```\n".format(req_rarity, config.rarities)
 
     if extra:
-        post += "Omitted "
+        post += "Showing 3 cheapest prints of each rarity.\nOmitted "
         for key, value in extra.items():
             post += "{} {}, ".format(value, key)
         post = post[:-2] + " print(s)"
 
-    # human_url = "https://yugiohprices.com/card_price?name={}".format(quote(name, safe=''))
     icon, color, image = get_card_properties(name)
     em = discord.Embed(type="rich",
                        description="```{}```\n{}\n".format(pt, post),
-                       color=int(color, 0))
+                       color=int(color, 0),
+                       title="View on YugiohPrices.com",
+                       url=config.card_price_url.format(quote(name)))
     em.set_author(name=name, icon_url=icon)
     em.set_footer(text="Data from YugiohPrices.com. May not be 100% accurate, use only as an estimate.",
-                  icon_url="http://i.imgur.com/kLsxdAd.png")
+                  icon_url=config.icons["YGOP"])
     # em.set_thumbnail(url=image)
-    return None, em
+    return em, True
 
 
 def get_card_properties(name):
-    r = requests.get("http://yugiohprices.com/api/card_data/{}".format(name))
+    r = requests.get(config.card_data_endpoint.format(name))
 
-    if r.status_code != 200:
-        return
+    if r.status_code not in (200, 404):
+        return r.status_code
+
+    if r.status_code == 404:
+        return None
 
     j = r.json()
     if j["status"] == "success":
@@ -98,7 +117,7 @@ def get_card_properties(name):
                     color = config.colors[key]
                     break
 
-        image = requests.get("http://yugiohprices.com/api/card_image/{}".format(name)).url
+        image = requests.get(config.card_image_endpoint.format(name)).url
 
         return icon, color, image
 

@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 description = "A bot that retrieves prices of Yu-Gi-Oh! cards from YugiohPrices.com"
 prefix = "$"
@@ -16,7 +16,17 @@ with open(config_path, 'r') as f:
     owner_id = j["owner_id"]
 
 max_results = 3
-trunc_len = 20
+trunc_len = 18
+similarity = 0.6
+
+card_price_endpoint = "http://yugiohprices.com/api/get_card_prices/{}"
+card_price_url = "https://yugiohprices.com/card_price?name={}"
+card_data_endpoint = "http://yugiohprices.com/api/card_data/{}"
+card_image_endpoint = "http://yugiohprices.com/api/card_image/{}"
+
+set_data_endpoint = "http://yugiohprices.com/api/set_data/{}"
+set_data_url = "https://yugiohprices.com/browse_sets?set={}"
+set_image_endpoint = "http://yugiohprices.com/api/set_image/{}"
 
 icons = {
     "dark": "http://i.imgur.com/slNEyVk.png",
@@ -32,7 +42,9 @@ icons = {
     "Quick-Play": "http://i.imgur.com/bv6OTZg.png",
     "Field": "http://i.imgur.com/aUFrtm1.png",
     "Ritual": "http://i.imgur.com/MYquQVC.png",
-    "Counter": "http://i.imgur.com/hVGUA9L.png"
+    "Counter": "http://i.imgur.com/hVGUA9L.png",
+    "Error": "https://i.imgur.com/1aLcN1S.png",
+    "YGOP": "http://i.imgur.com/kLsxdAd.png"
 }
 
 colors = {

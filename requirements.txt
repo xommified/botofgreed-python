@@ -1,3 +1,5 @@
 requests
 prettytable
 discord
+pandas
+colorthief

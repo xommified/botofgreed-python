@@ -55,10 +55,13 @@ def check_for_new_sets():
 
     new = set(r.json())
 
-    with open(config.sets_path, "r") as f:
-        old = set(json.load(f))
+    try:
+        with open(config.sets_path, "r") as f:
+            old = set(json.load(f))
+    except IOError:
+        old = set()
 
-    new_sets = new-old
+    new_sets = sorted(new-old)
     starting, ending = get_card_names(all_sets=False, sets=new_sets)
 
     with open(config.sets_path, "w") as f:
@@ -83,22 +86,31 @@ def get_set_names():
 def get_card_names(all_sets=True, sets=None):
 
     if all_sets:
-        with open(config.sets_path, "r") as f:
-            sets = json.load(f)
+        try:
+            with open(config.sets_path, "r") as f:
+                sets = json.load(f)
+        except IOError:
+            get_set_names()
+            with open(config.sets_path, "r") as f:
+                sets = json.load(f)
+
         all_cards = set()
     else:
-        with open(config.cards_path, "r") as f:
-            all_cards = set(json.load(f))
+        try:
+            with open(config.cards_path, "r") as f:
+                all_cards = set(json.load(f))
+        except IOError:
+            all_cards = set()
 
     starting = len(all_cards)
     print("Starting with {} cards.".format(starting))
 
-    for set_name in sets:
-        print("Getting {}".format(set_name))
+    for i, set_name in enumerate(sets):
+        print("{}/{}: Getting {}".format(i, len(sets), set_name))
         r = requests.get("http://yugiohprices.com/api/set_data/{}".format(set_name))
         if r.status_code != 200:
-            print("not good")
-            return
+            print("Error: {}".format(r))
+            continue
         j = r.json()
         print([x["name"] for x in j["data"]["cards"]])
         for card in j["data"]["cards"]:

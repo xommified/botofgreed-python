@@ -2,11 +2,18 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('.'))
-from botofgreed import bot
 from botofgreed import config
 from botofgreed.ygoprices import utils
 from botofgreed.ygoprices import cards
 from botofgreed.ygoprices import sets
+
+from discord.ext import commands
+
+print("Starting BotofGreed...")
+sys.path.insert(0, os.path.abspath('.'))
+from botofgreed import config
+
+bot = commands.Bot(command_prefix=config.prefix, description=config.description)
 
 
 @bot.event
@@ -70,17 +77,18 @@ async def ps(ctx, *, arg):
 
 
 @bot.command(pass_context=True)
-async def kill(ctx):
+async def snap(ctx):
     if ctx.message.author.id == config.owner_id:
+        await bot.say("I don't feel so good mister xomm...")
         await bot.logout()
 
 
 @bot.command(pass_context=True)
 async def update(ctx):
     if ctx.message.author.id == config.owner_id:
-        utils.get_set_names()
-        utils.get_card_names()
-        bot.say("Finished updating names database.")
+        await bot.say("Updating names database.")
+        r, s, e = utils.check_for_new_sets()
+        await bot.say("Finished updating names database. New sets: {}, {} -> {} cards.".format(r, s, e))
 
 
 def run():

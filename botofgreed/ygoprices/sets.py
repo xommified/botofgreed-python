@@ -84,7 +84,9 @@ def build_set_message(set_name, resp):
 
     em = discord.Embed(type="rich",
                        description="```{}```\n{}\n".format(pt, post),
-                       color=int(color, 0))
+                       color=int(color, 0),
+                       title="View on YugiohPrices.com",
+                       url=config.set_data_url.format(quote(set_name)))
     em.set_author(name=set_name, icon_url=r2.url)
     em.set_footer(text="Data from YugiohPrices.com. May not be 100% accurate, use only as an estimate.",
                   icon_url=config.icons["YGOP"])

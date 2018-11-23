@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 
 sys.path.insert(0, os.path.abspath('.'))
 from botofgreed import config
@@ -11,7 +12,14 @@ from discord.ext import commands
 from discord import Embed
 from discord import Game
 
-print("Starting BotofGreed...")
+logging.getLogger().addHandler(logging.StreamHandler())
+logger = logging.getLogger('discord')
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
+
+logger.info("Starting BotofGreed...")
 sys.path.insert(0, os.path.abspath('.'))
 from botofgreed import config
 
@@ -19,9 +27,11 @@ bot = commands.Bot(command_prefix=config.prefix, description=config.description)
 bot.remove_command('help')
 
 
+
+
 @bot.event
 async def on_ready():
-    print("Logged in as: {}. ID: {}".format(bot.user.name, bot.user.id))
+    logger.info("Logged in as: {}. ID: {}".format(bot.user.name, bot.user.id))
     await bot.change_presence(game=Game(name="$help for info",
                                         url="https://github.com/xommified/botofgreed-python",
                                         type=1),
@@ -30,7 +40,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    print("got message: {}".format(message.content))
+    logger.info("got message: {}".format(message.content))
     if not message.author.bot:
         if message.content.startswith("$$"):
             await bot.send_message(message.channel, ("<@{}>: $$ has been deprecated, use `$pc` instead. "

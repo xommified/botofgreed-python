@@ -50,7 +50,7 @@ def closest_name(name, lookup="card"):
 def check_for_new_sets():
     r = requests.get("http://yugiohprices.com/api/card_sets")
     if r.status_code != 200:
-        print("not good")
+        logger.info("not good")
         return
 
     new = set(r.json())
@@ -75,7 +75,7 @@ def check_for_new_sets():
 def get_set_names():
     r = requests.get("http://yugiohprices.com/api/card_sets")
     if r.status_code != 200:
-        print("not good")
+        logger.info("not good")
         return
 
     j = r.json()
@@ -103,23 +103,23 @@ def get_card_names(all_sets=True, sets=None):
             all_cards = set()
 
     starting = len(all_cards)
-    print("Starting with {} cards.".format(starting))
+    logger.info("Starting with {} cards.".format(starting))
 
     for i, set_name in enumerate(sets):
-        print("{}/{}: Getting {}".format(i, len(sets), set_name))
+        logger.info("{}/{}: Getting {}".format(i, len(sets), set_name))
         r = requests.get("http://yugiohprices.com/api/set_data/{}".format(set_name))
         if r.status_code != 200:
-            print("Error: {}".format(r))
+            logger.info("Error: {}".format(r))
             continue
         j = r.json()
-        print([x["name"] for x in j["data"]["cards"]])
+        logger.info([x["name"] for x in j["data"]["cards"]])
         for card in j["data"]["cards"]:
             all_cards.add(card["name"])
 
-        # print(all_cards)
+        # logger.info(all_cards)
 
     ending = len(all_cards)
-    print("Finished with {} cards.".format(ending))
+    logger.info("Finished with {} cards.".format(ending))
 
     with open(config.cards_path, "w") as f:
         json.dump(list(all_cards), f)

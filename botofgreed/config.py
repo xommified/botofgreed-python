@@ -16,6 +16,7 @@ with open(config_path, 'r') as f:
     owner_id = j["owner_id"]
 
 max_results = 3
+max_with_rarity = 10
 trunc_len = 18
 similarity = 0.6
 
@@ -44,7 +45,8 @@ icons = {
     "Ritual": "http://i.imgur.com/MYquQVC.png",
     "Counter": "http://i.imgur.com/hVGUA9L.png",
     "Error": "https://i.imgur.com/1aLcN1S.png",
-    "YGOP": "http://i.imgur.com/kLsxdAd.png"
+    "YGOP": "http://i.imgur.com/kLsxdAd.png",
+    "Help": "https://i.imgur.com/DZMsgey.png"
 }
 
 colors = {

@@ -47,6 +47,10 @@ def build_card_message(name, resp, req_rarity, rarity_guess):
 
     seen = {}
     extra = {}
+    if req_rarity:
+        max_results = config.max_with_rarity
+    else:
+        max_results = config.max_results
 
     for i, row in enumerate(resp["data"]):
 
@@ -57,7 +61,7 @@ def build_card_message(name, resp, req_rarity, rarity_guess):
             seen[rarity] = 0
         seen[rarity] += 1
 
-        if seen[rarity] > config.max_results:
+        if seen[rarity] > max_results:
             if rarity not in extra:
                 extra[rarity] = 0
             extra[rarity] += 1
@@ -77,7 +81,7 @@ def build_card_message(name, resp, req_rarity, rarity_guess):
         post += "Unknown rarity, best guess: `{}`. Valid rarities are: \n```{}```\n".format(req_rarity, config.rarities)
 
     if extra:
-        post += "Showing 3 cheapest prints of each rarity.\nOmitted "
+        post += "Showing {} cheapest prints of each rarity.\nOmitted ".format(max_results)
         for key, value in extra.items():
             post += "{} {}, ".format(value, key)
         post = post[:-2] + " print(s)"

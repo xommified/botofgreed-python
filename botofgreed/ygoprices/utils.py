@@ -1,9 +1,12 @@
 import difflib
 import json
+import logging
 
 import requests
 
 from botofgreed import config
+
+logger = logging.getLogger(__name__)
 
 
 def get_rarity(rarity):
@@ -50,7 +53,7 @@ def closest_name(name, lookup="card"):
 def check_for_new_sets():
     r = requests.get("http://yugiohprices.com/api/card_sets")
     if r.status_code != 200:
-        logger.info("not good")
+        logger.info(r.status_code)
         return
 
     new = set(r.json())

@@ -40,7 +40,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    logger.info("got message: {}".format(message.content))
+    # logger.info("got message: {}".format(message.content))
     if not message.author.bot:
         if message.content.startswith("$$"):
             await bot.send_message(message.channel, ("<@{}>: $$ has been deprecated, use `$pc` instead. "
